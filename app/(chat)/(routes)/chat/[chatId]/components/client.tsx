@@ -5,6 +5,7 @@ import { Companion, Message } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { useCompletion } from "ai/react";
+import { ChatForm } from "@/components/Chat-Form";
 
 interface ChatClientProps {
   companion: Companion & {
