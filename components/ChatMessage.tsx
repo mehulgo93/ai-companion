@@ -28,7 +28,7 @@ export const ChatMessage = ({
 
   const onCopy = () => {
     if (!content) {
-      return;
+      return content;
     }
 
     navigator.clipboard.writeText(content);
