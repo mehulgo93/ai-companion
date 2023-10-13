@@ -1,60 +1,69 @@
-import Image from "next/image";
-import Link from "next/link";
-import { Companion } from "@prisma/client";
-import { MessagesSquare } from "lucide-react";
+"use client";
 
-import { Card, CardFooter, CardHeader } from "@/components/ui/card";
+import { BeatLoader } from "react-spinners";
+import { Copy } from "lucide-react";
+import { useTheme } from "next-themes";
 
-interface CompanionsProps {
-  data: (Companion & {
-    _count: {
-      messages: number;
-    };
-  })[];
+import { cn } from "@/lib/utils";
+import { BotAvatar } from "@/components/bot-avatar";
+import { UserAvatar } from "@/components/user-avatar";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+
+export interface ChatMessageProps {
+  role: "system" | "user";
+  content?: string;
+  isLoading?: boolean;
+  src?: string;
 }
 
-export const Companions = ({ data }: CompanionsProps) => {
-  if (data.length === 0) {
-    return (
-      <div className="pt-10 flex flex-col items-center justify-center space-y-3">
-        <div className="relative w-60 h-60">
-          <Image fill src="/empty.png" alt="Empty" />
-        </div>
-        <p className="text-sm text-muted-foreground">No companions found.</p>
-      </div>
-    );
-  }
+export const ChatMessage = ({
+  role,
+  content,
+  isLoading,
+  src,
+}: ChatMessageProps) => {
+  const { toast } = useToast();
+  const { theme } = useTheme();
+
+  const onCopy = () => {
+    if (!content) {
+      return;
+    }
+
+    navigator.clipboard.writeText(content);
+    toast({
+      description: "Message copied to clipboard.",
+      duration: 3000,
+    });
+  };
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 pb-10">
-      {data.map((item) => (
-        <Card
-          key={item.name}
-          className="bg-primary/10 rounded-xl cursor-pointer hover:opacity-75 transition border-0"
+    <div
+      className={cn(
+        "group flex items-start gap-x-3 py-4 w-full",
+        role === "user" && "justify-end"
+      )}
+    >
+      {role !== "user" && src && <BotAvatar src={src} />}
+      <div className="rounded-md px-4 py-2 max-w-sm text-sm bg-primary/10">
+        {isLoading ? (
+          <BeatLoader color={theme === "light" ? "black" : "white"} size={5} />
+        ) : (
+          content
+        )}
+      </div>
+      {role === "user" && <UserAvatar />}
+      {role !== "user" && !isLoading && (
+        <Button
+          onClick={onCopy}
+          className="opacity-0 group-hover:opacity-100 transition"
+          size="icon"
+          variant="ghost"
         >
-          <Link href={`/chat/${item.id}`}>
-            <CardHeader className="flex items-center justify-center text-center text-muted-foreground">
-              <div className="relative w-32 h-32">
-                <Image
-                  src={item.src}
-                  fill
-                  className="rounded-xl object-cover"
-                  alt="Character"
-                />
-              </div>
-              <p className="font-bold">{item.name}</p>
-              <p className="text-xs">{item.description}</p>
-            </CardHeader>
-            <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
-              <p className="lowercase">@{item.userName}</p>
-              <div className="flex items-center">
-                <MessagesSquare className="w-3 h-3 mr-1" />
-                {item._count.messages}
-              </div>
-            </CardFooter>
-          </Link>
-        </Card>
-      ))}
+          <Copy className="w-4 h-4" />
+        </Button>
+      )}
     </div>
   );
 };
