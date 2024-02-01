@@ -85,7 +85,7 @@ export async function POST(
     // Call Replicate for inference
     const model = new Replicate({
       model:
-        "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3",
+        "meta/codellama-70b:69090e16762083aee59c9df30ccf0865b501672925d9152b8f4445bd57e730fa",
       input: {
         max_length: 2048,
       },
